@@ -70,13 +70,52 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
+    where
+        T: Ord,
+    {
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut merged_list = LinkedList::new();
+
+        let mut ptr_a = list_a.start;
+        let mut ptr_b = list_b.start;
+
+        while let (Some(mut node_a), Some(mut node_b)) = (ptr_a, ptr_b) {
+            unsafe {
+                let val_a = &(*node_a.as_ptr()).val;
+                let val_b = &(*node_b.as_ptr()).val;
+
+                if val_a <= val_b {
+                    merged_list.add(std::ptr::read(val_a));
+                    ptr_a = (*node_a.as_ptr()).next;
+                } else {
+                    merged_list.add(std::ptr::read(val_b));
+                    ptr_b = (*node_b.as_ptr()).next;
+                }
+            }
         }
+
+        while let Some(mut node_a) = ptr_a {
+            unsafe {
+                let val_a = &(*node_a.as_ptr()).val;
+                merged_list.add(std::ptr::read(val_a));
+                ptr_a = (*node_a.as_ptr()).next;
+            }
+        }
+
+        while let Some(mut node_b) = ptr_b {
+            unsafe {
+                let val_b = &(*node_b.as_ptr()).val;
+                merged_list.add(std::ptr::read(val_b));
+                ptr_b = (*node_b.as_ptr()).next;
+            }
+        }
+
+        merged_list
+		// Self {
+        //     length: merged_list.length,
+        //     start: merged_list.start,
+        //     end: merged_list.end,
+        // }
 	}
 }
 

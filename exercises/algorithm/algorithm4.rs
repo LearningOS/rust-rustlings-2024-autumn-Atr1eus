@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -51,12 +51,25 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        match self.root {
+            Some(ref mut node) => {
+                // 如果根节点已经存在，调用 TreeNode 的 insert 递归插入
+                node.insert(value);
+            }
+            None => {
+                // 如果根节点为空，插入新的值作为根节点
+                self.root = Some(Box::new(TreeNode::new(value)));
+            }
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        match self.root {
+            Some(ref node) => node.search(value),
+            None => false, // 树为空，直接返回 false
+        }
     }
 }
 
@@ -67,6 +80,45 @@ where
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(ref mut left_node) = self.left {
+                    left_node.insert(value); // 递归到左子树
+                } else {
+                    self.left = Some(Box::new(TreeNode::new(value))); // 插入到左子树
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref mut right_node) = self.right {
+                    right_node.insert(value); // 递归到右子树
+                } else {
+                    self.right = Some(Box::new(TreeNode::new(value))); // 插入到右子树
+                }
+            }
+            Ordering::Equal => {
+                // 如果值相同，可以选择忽略插入，或根据应用场景处理
+                // 这里我们忽略相同的值
+            }
+        }
+    }
+    fn search(&self, value: T) -> bool {
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(ref left_node) = self.left {
+                    left_node.search(value) // 递归到左子树
+                } else {
+                    false // 左子树为空，值不存在
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref right_node) = self.right {
+                    right_node.search(value) // 递归到右子树
+                } else {
+                    false // 右子树为空，值不存在
+                }
+            }
+            Ordering::Equal => true, // 找到值
+        }
     }
 }
 

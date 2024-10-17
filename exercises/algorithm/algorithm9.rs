@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,7 +38,35 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.count += 1;
+        self.items.push(value);
+
+        // Heapify Up
+        let mut idx = self.count;
+        while self.parent_idx(idx) > 0 {
+            let pdx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[pdx]) {
+                self.items.swap(idx, pdx);
+            }
+            idx = pdx;
+        }
     }
+
+
+    // fn down_heap(&mut self, mut idx: usize) {
+    //     while self.children_present(idx) {
+    //         let smallest = self.smallest_child_idx(idx); // 获取子节点中较小的那个
+    //         if (self.comparator)(&self.items[smallest], &self.items[idx]) {
+    //             // 如果子节点比当前节点优，则交换
+    //             self.items.swap(idx, smallest);
+    //             idx = smallest; // 更新当前节点索引为子节点，继续下滤
+    //         } else {
+    //             // 如果不需要交换，直接退出循环
+    //             break;
+    //         }
+    //     }
+    // }
+    
 
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
@@ -58,7 +86,17 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		if self.right_child_idx(idx) > self.count {
+            self.left_child_idx(idx)
+        } else {
+            let ldx = self.left_child_idx(idx);
+            let rdx = self.right_child_idx(idx);
+            if (self.comparator)(&self.items[ldx], &self.items[rdx]) {
+                ldx
+            } else {
+                rdx
+            }
+        }
     }
 }
 
@@ -85,7 +123,28 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if self.count == 0 {
+            return None;
+        }
+        // This feels like a function built for heap impl :)
+        // Removes an item at an index and fills in with the last item
+        // of the Vec
+        let next = Some(self.items.swap_remove(1));
+        self.count -= 1;
+
+        if self.count > 0 {
+            // Heapify Down
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let cdx = self.smallest_child_idx(idx);
+                if !(self.comparator)(&self.items[idx], &self.items[cdx]) {
+                    self.items.swap(idx, cdx);
+                }
+                idx = cdx;
+            }
+        }
+
+        next
     }
 }
 
